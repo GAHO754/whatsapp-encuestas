@@ -23,8 +23,6 @@ app.get("/test", async (req, res) => {
     res.send("Error enviando mensaje");
   }
 });
-
-
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 
@@ -79,3 +77,4 @@ app.post("/webhook-encuesta", async (req, res) => {
     res.status(500).send("Error");
   }
 });
+
