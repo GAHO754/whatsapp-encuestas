@@ -9,11 +9,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.send("Servidor activo 🚀");
 });
-
-app.get("/test-webhook", (req, res) => {
-  console.log("Webhook de prueba recibido");
-  res.send("Ruta test-webhook funcionando");
+app.use((req, res, next) => {
+  console.log("Nueva petición recibida:", req.method, req.url);
+  next();
 });
+
+app.post("/webhook-encuesta", async (req, res) => {
+  console.log("WEBHOOK RECIBIDO 🚀");
+  console.log("BODY:", req.body);
+
+  res.status(200).send("Webhook recibido");
+});
+
 
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
