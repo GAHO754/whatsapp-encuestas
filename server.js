@@ -7,8 +7,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
-  res.send("Servidor de encuestas funcionando 🚀");
+  res.send("Servidor activo 🚀");
 });
+
+app.get("/test-webhook", (req, res) => {
+  console.log("Webhook de prueba recibido");
+  res.send("Ruta test-webhook funcionando");
+});
+
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
