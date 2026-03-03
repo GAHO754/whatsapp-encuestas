@@ -4,6 +4,7 @@ const twilio = require("twilio");
 
 const app = express();
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
   res.send("Servidor de encuestas funcionando 🚀");
 });
@@ -31,28 +32,42 @@ const client = twilio(accountSid, authToken);
 
 app.post("/webhook-encuesta", async (req, res) => {
   try {
-    const data = req.body;
+    console.log("Webhook recibido:", req.body);
 
-    const nombre = data.firstName || "";
-    const apellido = data.lastName || "";
-    const telefono = data.phone;
-    const restaurante = data.restaurant || "Restaurante";
+    const nombre = req.body.firstName || req.body.nombre || "";
+    const apellido = req.body.lastName || req.body.apellido || "";
+    const telefono =
+      req.body.phone ||
+      req.body.phone_number ||
+      req.body.telefono;
 
-    let mensaje = "";
+    const restaurante =
+      req.body.restaurant ||
+      req.body.location ||
+      "Restaurante";
+
+    if (!telefono) {
+      return res.status(400).send("No se recibió teléfono");
+    }
+
+    let mensaje = `Hola ${nombre} ${apellido}, gracias por responder la encuesta. 🎁`;
 
     if (restaurante.includes("Yoko")) {
-      mensaje = `Hola ${nombre} ${apellido}, Yoko 🍣 agradece que hayas respondido nuestra encuesta. Disfruta tu recompensa 🎁`;
+      mensaje = `Hola ${nombre}, Yoko 🍣 agradece que hayas respondido nuestra encuesta. Disfruta tu recompensa 🎁`;
     }
 
     if (restaurante.includes("Ardeo")) {
-      mensaje = `Hola ${nombre} ${apellido}, Ardeo agradece tu tiempo al responder nuestra encuesta. Aquí está tu recompensa 🎁`;
+      mensaje = `Hola ${nombre}, Ardeo agradece tu tiempo al responder nuestra encuesta. 🎁`;
     }
 
     if (restaurante.includes("Great American")) {
-      mensaje = `Hola ${nombre} ${apellido}, Great American agradece tu visita. Disfruta tu recompensa 🎁`;
+      mensaje = `Hola ${nombre}, Great American agradece tu visita. 🎁`;
+    }
+    if (restaurante.includes("Muzza")) {
+      mensaje = `Hola ${nombre} ${apellido}, Muzza agradece mucho tu visita. Disfruta tu recompensa gracias buen dia 🎁`;
     }
 
-    await client.messages.create({
+     await client.messages.create({
       from: "whatsapp:+14155238886",
       to: `whatsapp:+${telefono}`,
       body: mensaje
@@ -63,8 +78,4 @@ app.post("/webhook-encuesta", async (req, res) => {
     console.error(error);
     res.status(500).send("Error");
   }
-});
-
-app.listen(3000, () => {
-  console.log("Servidor corriendo en puerto 3000");
 });
