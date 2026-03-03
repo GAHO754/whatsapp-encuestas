@@ -6,29 +6,21 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.send("Servidor activo 🚀");
-});
-app.use((req, res, next) => {
-  console.log("Nueva petición recibida:", req.method, req.url);
-  next();
-});
-
-app.post("/webhook-encuesta", async (req, res) => {
-  console.log("WEBHOOK RECIBIDO 🚀");
-  console.log("BODY:", req.body);
-
-  res.status(200).send("Webhook recibido");
-});
-
-
-
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 
 const client = twilio(accountSid, authToken);
 
+// Ruta principal
+app.get("/", (req, res) => {
+  res.send("Servidor activo 🚀");
+});
 
+// Log de peticiones
+app.use((req, res, next) => {
+  console.log("Nueva petición:", req.method, req.url);
+  next();
+});
 // 📌 IMÁGENES POR RESTAURANTE
 const imagenes = {
   Yoko: [
@@ -60,60 +52,49 @@ const imagenes = {
 };
 
 
-// 📌 Función para elegir imagen aleatoria
+// Función imagen aleatoria
 function obtenerImagenAleatoria(lista) {
   return lista[Math.floor(Math.random() * lista.length)];
 }
 
-
+// 🔥 WEBHOOK REAL
 app.post("/webhook-encuesta", async (req, res) => {
   try {
-    console.log("Webhook recibido:", req.body);
+    console.log("WEBHOOK RECIBIDO 🚀");
+    console.log(req.body);
 
-    const nombre = req.body.firstName || req.body.nombre || "";
-    const apellido = req.body.lastName || req.body.apellido || "";
-
-    let telefono =
-      req.body.phone ||
-      req.body.phone_number ||
-      req.body.telefono;
-
-    const restaurante =
-      req.body.restaurant ||
-      req.body.location ||
-      "Restaurante";
+    const nombre = req.body.customer?.firstName || "";
+    const apellido = req.body.customer?.lastName || "";
+    let telefono = req.body.customer?.phone || "";
+    const restaurante = req.body.survey?.name || "";
 
     if (!telefono) {
-      return res.status(400).send("No se recibió teléfono");
+      console.log("No hay teléfono");
+      return res.status(200).send("Sin teléfono");
     }
 
-    // Limpiar teléfono
     telefono = telefono.replace(/\D/g, "");
 
     let mensaje = "";
     let imagenSeleccionada = "";
 
-    // YOKO
     if (restaurante.includes("Yoko")) {
       mensaje = `Hola ${nombre}, Yoko 🍣 agradece que hayas respondido nuestra encuesta. Disfruta tu recompensa 🎁`;
       imagenSeleccionada = obtenerImagenAleatoria(imagenes.Yoko);
     }
 
-    // ARDEO
     else if (restaurante.includes("Ardeo")) {
       mensaje = `Hola ${nombre}, Ardeo agradece tu tiempo al responder nuestra encuesta. 🎁`;
       imagenSeleccionada = obtenerImagenAleatoria(imagenes.Ardeo);
     }
 
-    // GREAT AMERICAN
     else if (restaurante.includes("Great American")) {
       mensaje = `Hola ${nombre}, Great American agradece tu visita. 🎁`;
       imagenSeleccionada = obtenerImagenAleatoria(imagenes.GreatAmerican);
     }
 
-    // MUZZA
     else if (restaurante.includes("Muzza")) {
-      mensaje = `Hola ${nombre}, Muzza agradece mucho tu visita. Disfruta tu recompensa 🎁`;
+      mensaje = `Hola ${nombre}, Muzza agradece mucho tu visita. 🎁`;
       imagenSeleccionada = obtenerImagenAleatoria(imagenes.Muzza);
     }
 
@@ -123,19 +104,20 @@ app.post("/webhook-encuesta", async (req, res) => {
 
     await client.messages.create({
       from: "whatsapp:+14155238886",
-      to: `whatsapp:+${telefono}`,
+      to: `whatsapp:+52${telefono}`,
       body: mensaje,
-      mediaUrl: imagenSeleccionada ? [imagenSeleccionada] : []
+      mediaUrl: imagenSeleccionada ? [imagenSeleccionada] : undefined
     });
 
-    res.status(200).send("Mensaje enviado con imagen");
+    console.log("Mensaje enviado a:", telefono);
+
+    res.status(200).send("OK");
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error enviando WhatsApp:", error);
     res.status(500).send("Error");
   }
 });
-
 
 app.listen(3000, () => {
   console.log("Servidor corriendo en puerto 3000");
