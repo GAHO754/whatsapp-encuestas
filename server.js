@@ -69,11 +69,11 @@ app.post("/webhook-encuesta", async (req, res) => {
     const restaurante = req.body.survey?.name || "";
 
     if (!telefono) {
-      console.log("No hay teléfono");
-      return res.status(200).send("Sin teléfono");
-    }
+  console.log("No hay teléfono");
+  return res.status(200).send("Sin teléfono");
+}
 
-    telefono = telefono.replace(/\D/g, "");
+telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
 
     let mensaje = "";
     let imagenSeleccionada = "";
@@ -103,11 +103,12 @@ app.post("/webhook-encuesta", async (req, res) => {
     }
 
     await client.messages.create({
-      from: "whatsapp:+14155238886",
-      to: `whatsapp:+52${telefono}`,
-      body: mensaje,
-      mediaUrl: imagenSeleccionada ? [imagenSeleccionada] : undefined
-    });
+  from: "whatsapp:+14155238886",
+  to: `whatsapp:${telefono}`,
+  body: mensaje,
+  mediaUrl: imagenSeleccionada ? [imagenSeleccionada] : undefined
+});
+
 
     console.log("Mensaje enviado a:", telefono);
 
