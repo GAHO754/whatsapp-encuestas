@@ -9,20 +9,23 @@ app.get("/", (req, res) => {
   res.send("Servidor de encuestas funcionando 🚀");
 });
 
-app.get("/test", async (req, res) => {
+app.get("/test-webhook", async (req, res) => {
   try {
     await client.messages.create({
       from: "whatsapp:+14155238886",
       to: "whatsapp:+5216568196543",
-      body: "Prueba de WhatsApp desde Render 🚀"
+      body: "Prueba simulando encuesta completada"
     });
 
-    res.send("Mensaje enviado por WhatsApp");
+    res.send("Webhook simulado");
   } catch (error) {
     console.error(error);
-    res.send("Error enviando mensaje");
+    res.send("Error");
   }
 });
+
+
+
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 
@@ -77,4 +80,3 @@ app.post("/webhook-encuesta", async (req, res) => {
     res.status(500).send("Error");
   }
 });
-
