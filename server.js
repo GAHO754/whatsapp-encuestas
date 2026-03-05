@@ -78,7 +78,7 @@ telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
     let mensaje = "";
     let imagenSeleccionada = "";
     // 🎟 Generar cupón único
-    const cupon = `${restaurante.toUpperCase().replace(/\s/g, "")}-${Math.floor(10000 + Math.random() * 90000)}`;
+const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encodeURIComponent(imagenSeleccionada)}&cupon=${cupon}&restaurante=${encodeURIComponent(restaurante)}`;
 
 
     if (restaurante.includes("Yoko")) {
