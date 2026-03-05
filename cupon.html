@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cupón de Cortesía</title>
+<link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+<div class="cupon">
+
+<img id="imagenCupon">
+
+<h1>🎉 ¡Gracias por tu visita!</h1>
+
+<p>Has recibido un cupón de cortesía de</p>
+
+<h2 id="restaurante">Restaurante</h2>
+
+<div class="codigo" id="codigo">
+CUPON-0000
+</div>
+
+<p class="mensaje">
+Muestra este cupón en tu próxima visita.
+</p>
+
+</div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+
+const imagen = params.get("img")
+const cupon = params.get("cupon")
+const restaurante = params.get("restaurante")
+
+if(imagen){
+document.getElementById("imagenCupon").src = imagen
+}
+
+if(cupon){
+document.getElementById("codigo").innerText = cupon
+}
+
+if(restaurante){
+document.getElementById("restaurante").innerText = restaurante
+}
+
+</script>
+
+</body>
+</html>
