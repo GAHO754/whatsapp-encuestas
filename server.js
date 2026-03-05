@@ -3,8 +3,11 @@ const bodyParser = require("body-parser");
 const twilio = require("twilio");
 
 const app = express();
+app.use(express.static(__dirname));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
@@ -132,6 +135,8 @@ const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encod
   }
 });
 
-app.listen(3000, () => {
-  console.log("Servidor corriendo en puerto 3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Servidor corriendo en puerto", PORT);
 });
