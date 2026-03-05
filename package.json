@@ -1,10 +1,13 @@
 {
   "name": "whatsapp-encuestas",
   "version": "1.0.0",
+  "description": "Servidor para encuestas con generación de cupones",
   "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "express": "^4.18.2",
-    "twilio": "^4.0.0",
     "body-parser": "^1.20.2"
   }
 }
