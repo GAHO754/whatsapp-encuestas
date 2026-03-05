@@ -10,12 +10,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
-
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-
-const client = twilio(accountSid, authToken);
-
 // Ruta principal
 app.get("/", (req, res) => {
   res.send("Servidor activo 🚀");
@@ -81,34 +75,38 @@ app.post("/webhook-encuesta", async (req, res) => {
 telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
 
     let mensaje = "";
-    let imagenSeleccionada = "";
-    // 🎟 Generar cupón único
+let imagenSeleccionada = "";
+
+// 🎟 Generar cupón único
+const cupon = `${restaurante.toUpperCase().replace(/\s/g, "")}-${Math.floor(10000 + Math.random() * 90000)}`;
+
+if (restaurante.includes("Yoko")) {
+  mensaje = `Hola ${nombre}, Yoko 🍣 agradece que hayas respondido nuestra encuesta. Disfruta tu recompensa 🎁`;
+  imagenSeleccionada = obtenerImagenAleatoria(imagenes.Yoko);
+}
+
+else if (restaurante.includes("Ardeo")) {
+  mensaje = `Hola ${nombre}, Ardeo agradece tu tiempo al responder nuestra encuesta. 🎁`;
+  imagenSeleccionada = obtenerImagenAleatoria(imagenes.Ardeo);
+}
+
+else if (restaurante.includes("Great American")) {
+  mensaje = `Hola ${nombre}, Great American agradece tu visita. 🎁`;
+  imagenSeleccionada = obtenerImagenAleatoria(imagenes.GreatAmerican);
+}
+
+else if (restaurante.includes("Muzza")) {
+  mensaje = `Hola ${nombre}, Muzza agradece mucho tu visita. 🎁`;
+  imagenSeleccionada = obtenerImagenAleatoria(imagenes.Muzza);
+}
+
+else {
+  mensaje = `Hola ${nombre}, gracias por responder nuestra encuesta 🎁`;
+}
+
+// 🔗 Generar URL del cupón
 const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encodeURIComponent(imagenSeleccionada)}&cupon=${cupon}&restaurante=${encodeURIComponent(restaurante)}`;
 
-
-    if (restaurante.includes("Yoko")) {
-      mensaje = `Hola ${nombre}, Yoko 🍣 agradece que hayas respondido nuestra encuesta. Disfruta tu recompensa 🎁`;
-      imagenSeleccionada = obtenerImagenAleatoria(imagenes.Yoko);
-    }
-
-    else if (restaurante.includes("Ardeo")) {
-      mensaje = `Hola ${nombre}, Ardeo agradece tu tiempo al responder nuestra encuesta. 🎁`;
-      imagenSeleccionada = obtenerImagenAleatoria(imagenes.Ardeo);
-    }
-
-    else if (restaurante.includes("Great American")) {
-      mensaje = `Hola ${nombre}, Great American agradece tu visita. 🎁`;
-      imagenSeleccionada = obtenerImagenAleatoria(imagenes.GreatAmerican);
-    }
-
-    else if (restaurante.includes("Muzza")) {
-      mensaje = `Hola ${nombre}, Muzza agradece mucho tu visita. 🎁`;
-      imagenSeleccionada = obtenerImagenAleatoria(imagenes.Muzza);
-    }
-
-    else {
-      mensaje = `Hola ${nombre}, gracias por responder nuestra encuesta 🎁`;
-    }
 
     console.log("📲 SIMULACIÓN WHATSAPP");
     console.log("Cliente:", nombre, apellido);
@@ -123,12 +121,13 @@ const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encod
     console.log("Mensaje enviado a:", telefono);
 
    res.json({
-  status: "Cupón generado correctamente",
-  cliente: `${nombre} ${apellido}`,
-  telefono: telefono,
-  cupon: cupon,
-  imagen: imagenSeleccionada
-});
+    status: "Cupón generado correctamente",
+    cliente: `${nombre} ${apellido}`,
+    telefono: telefono,
+    cupon: cupon,
+    imagen: imagenSeleccionada,
+    url: urlCupon
+  });
 
 
   } catch (error) {
