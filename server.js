@@ -1,9 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const twilio = require("twilio");
 
 const app = express();
+
+// 🔹 ESTA LÍNEA PERMITE CARGAR HTML
 app.use(express.static(__dirname));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
