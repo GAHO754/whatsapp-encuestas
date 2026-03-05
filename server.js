@@ -1,14 +1,18 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const fetch = require("node-fetch");
 
 const app = express();
+
+// 🔹 DATOS WHATSAPP
+const WHATSAPP_TOKEN = "EAALZB4BnISHgBQ2WlBradHPZB9xD1dgzxYkqFoS3a0IwZBYoIEOIUf2g1ltVPpfJ33kWSrCOZBvCnjwOx8bOBQjWznJ40XPgiSnPvlWG0vvA281nZB1J2DUeLPyqASsGQfzXBGCbszSKmiLbArWOehKWcxT1CRo4wra5eeMSJglsZBYfFta18FfVX6do4rpBhMMLjpLikQnY4eZABrlatH77tBtdSzGthIVScAZAbrgDFjRZCK8Xs5opNg1eoYSGgSyUYcHKS39heqdzhXN20gRRDLJSK6wZDZD";
+const PHONE_NUMBER_ID = "978000385401936";
 
 // 🔹 ESTA LÍNEA PERMITE CARGAR HTML
 app.use(express.static(__dirname));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 
 // Ruta principal
 app.get("/", (req, res) => {
@@ -77,6 +81,40 @@ telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
     let mensaje = "";
 let imagenSeleccionada = "";
 
+// 📲 FUNCIÓN PARA ENVIAR WHATSAPP
+async function enviarWhatsApp(telefono, nombre, restaurante, cupon, urlCupon) {
+
+const url = `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`;
+
+const body = {
+  messaging_product: "whatsapp",
+  to: telefono.replace("+",""),
+  type: "text",
+  text: {
+    body:
+`Hola ${nombre} 👋
+
+${restaurante} agradece tu visita.
+
+🎁 Tu cupón es:
+${cupon}
+
+Puedes verlo aquí:
+${urlCupon}`
+  }
+};
+
+await fetch(url, {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${WHATSAPP_TOKEN}`,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(body)
+});
+
+}
+
 // 🎟 Generar cupón único
 const cupon = `${restaurante.toUpperCase().replace(/\s/g, "")}-${Math.floor(10000 + Math.random() * 90000)}`;
 
@@ -116,9 +154,16 @@ const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encod
     console.log("Imagen enviada:", imagenSeleccionada);
 
 
-
-
     console.log("Mensaje enviado a:", telefono);
+    // 📲 ENVIAR WHATSAPP REAL
+  await enviarWhatsApp(
+    telefono,
+    nombre,
+    restaurante,
+    cupon,
+    urlCupon
+  );
+
 
    res.json({
     status: "Cupón generado correctamente",
