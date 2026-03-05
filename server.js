@@ -77,6 +77,9 @@ telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
 
     let mensaje = "";
     let imagenSeleccionada = "";
+    // 🎟 Generar cupón único
+    const cupon = `${restaurante.toUpperCase().replace(/\s/g, "")}-${Math.floor(10000 + Math.random() * 90000)}`;
+
 
     if (restaurante.includes("Yoko")) {
       mensaje = `Hola ${nombre}, Yoko 🍣 agradece que hayas respondido nuestra encuesta. Disfruta tu recompensa 🎁`;
@@ -102,17 +105,26 @@ telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
       mensaje = `Hola ${nombre}, gracias por responder nuestra encuesta 🎁`;
     }
 
-    await client.messages.create({
-  from: "whatsapp:+14155238886",
-  to: `whatsapp:${telefono}`,
-  body: mensaje,
-  mediaUrl: imagenSeleccionada ? [imagenSeleccionada] : undefined
-});
+    console.log("📲 SIMULACIÓN WHATSAPP");
+    console.log("Cliente:", nombre, apellido);
+    console.log("Teléfono:", telefono);
+    console.log("Mensaje:", mensaje);
+    console.log("Cupón generado:", cupon);
+    console.log("Imagen enviada:", imagenSeleccionada);
+
+
 
 
     console.log("Mensaje enviado a:", telefono);
 
-    res.status(200).send("OK");
+   res.json({
+  status: "Cupón generado correctamente",
+  cliente: `${nombre} ${apellido}`,
+  telefono: telefono,
+  cupon: cupon,
+  imagen: imagenSeleccionada
+});
+
 
   } catch (error) {
     console.error("Error enviando WhatsApp:", error);
