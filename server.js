@@ -6,7 +6,7 @@ const app = express();
 
 // 🔹 DATOS WHATSAPP
 const WHATSAPP_TOKEN = "EAALZB4BnISHgBQ2WlBradHPZB9xD1dgzxYkqFoS3a0IwZBYoIEOIUf2g1ltVPpfJ33kWSrCOZBvCnjwOx8bOBQjWznJ40XPgiSnPvlWG0vvA281nZB1J2DUeLPyqASsGQfzXBGCbszSKmiLbArWOehKWcxT1CRo4wra5eeMSJglsZBYfFta18FfVX6do4rpBhMMLjpLikQnY4eZABrlatH77tBtdSzGthIVScAZAbrgDFjRZCK8Xs5opNg1eoYSGgSyUYcHKS39heqdzhXN20gRRDLJSK6wZDZD";
-const PHONE_NUMBER_ID = "978000385401936";
+const PHONE_NUMBER_ID = "1489827939468463";
 
 // 🔹 ESTA LÍNEA PERMITE CARGAR HTML
 app.use(express.static(__dirname));
@@ -59,28 +59,6 @@ const imagenes = {
 function obtenerImagenAleatoria(lista) {
   return lista[Math.floor(Math.random() * lista.length)];
 }
-
-// 🔥 WEBHOOK REAL
-app.post("/webhook-encuesta", async (req, res) => {
-  try {
-    console.log("WEBHOOK RECIBIDO 🚀");
-    console.log(req.body);
-
-    const nombre = req.body.customer?.firstName || "";
-    const apellido = req.body.customer?.lastName || "";
-    let telefono = req.body.customer?.phone || "";
-    const restaurante = req.body.survey?.name || "";
-
-    if (!telefono) {
-  console.log("No hay teléfono");
-  return res.status(200).send("Sin teléfono");
-}
-
-telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
-
-    let mensaje = "";
-let imagenSeleccionada = "";
-
 // 📲 FUNCIÓN PARA ENVIAR WHATSAPP
 async function enviarWhatsApp(telefono, nombre, restaurante, cupon, urlCupon) {
 
@@ -114,6 +92,29 @@ await fetch(url, {
 });
 
 }
+
+
+// 🔥 WEBHOOK REAL
+app.post("/webhook-encuesta", async (req, res) => {
+  try {
+    console.log("WEBHOOK RECIBIDO 🚀");
+    console.log(req.body);
+
+    const nombre = req.body.customer?.firstName || "";
+    const apellido = req.body.customer?.lastName || "";
+    let telefono = req.body.customer?.phone || "";
+    const restaurante = req.body.survey?.name || "";
+
+    if (!telefono) {
+  console.log("No hay teléfono");
+  return res.status(200).send("Sin teléfono");
+}
+
+telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
+
+    let mensaje = "";
+let imagenSeleccionada = "";
+
 
 // 🎟 Generar cupón único
 const cupon = `${restaurante.toUpperCase().replace(/\s/g, "")}-${Math.floor(10000 + Math.random() * 90000)}`;
