@@ -76,7 +76,7 @@ ${urlCupon}`
   }
 };
 
-await fetch(url, {
+const response = await fetch(url, {
   method: "POST",
   headers: {
     "Authorization": `Bearer ${WHATSAPP_TOKEN}`,
@@ -85,7 +85,12 @@ await fetch(url, {
   body: JSON.stringify(body)
 });
 
+const data = await response.json();
+
+console.log("Respuesta WhatsApp API:", data);
+
 }
+
 
 // 🔐 VERIFICACIÓN DEL WEBHOOK DE WHATSAPP
 const VERIFY_TOKEN = "token_whatsapp_123";
