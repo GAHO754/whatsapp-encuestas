@@ -3,14 +3,11 @@ const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
 
 const app = express();
-
 // 🔹 DATOS WHATSAPP
-const WHATSAPP_TOKEN = "EAALZB4BnISHgBQ2WlBradHPZB9xD1dgzxYkqFoS3a0IwZBYoIEOIUf2g1ltVPpfJ33kWSrCOZBvCnjwOx8bOBQjWznJ40XPgiSnPvlWG0vvA281nZB1J2DUeLPyqASsGQfzXBGCbszSKmiLbArWOehKWcxT1CRo4wra5eeMSJglsZBYfFta18FfVX6do4rpBhMMLjpLikQnY4eZABrlatH77tBtdSzGthIVScAZAbrgDFjRZCK8Xs5opNg1eoYSGgSyUYcHKS39heqdzhXN20gRRDLJSK6wZDZD";
+const WHATSAPP_TOKEN = "EAALZB4BnISHgBQ1gexJ7rCSMbA9lRu4J70pMydB9mT8N2QmDZA680EGd67PDSKPwAYn0mpIyTexyNelgQMDd0fUyX6k3d0upiMzMNaZBmLsm6rqV971AkRfGE6Jt29RjLZBmbtCYjSjRPXKcyq4q5cqcvaTi68hd9yiySWhCHhYntYCPIjwaO7t9LrG9el4kFYafubSD1Lk4zvDLPbhgHo7QzZCXXfqpTpoCvnmwT37TqTtXcFogMze8gmJgWlHnZA2ULvDdEiPyYsTlhWcL0QEdIfjE0ZD";
 const PHONE_NUMBER_ID = "1489827939468463";
-
 // 🔹 ESTA LÍNEA PERMITE CARGAR HTML
 app.use(express.static(__dirname));
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -32,13 +29,11 @@ const imagenes = {
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/ronin_1723744012375.webp",
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/yakimeshi_1723744016067.webp"
   ],
-
   Ardeo: [
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/betabel-braza_1723744190857.webp",
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/flamingo_1723744194875.webp",
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/pastel-de-pistache_1723744198972.webp"
   ],
-
   GreatAmerican: [
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/barro-tamarindo_1723744333488.webp",
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/coliflor-brasa_1723744336930.webp",
@@ -47,13 +42,11 @@ const imagenes = {
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/tapioca_1723744347387.webp",
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/coliflor-brasa_1723744336930_1749175243548.webp"
   ],
-
   Muzza: [
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/tikitaliano_1723744236052.webp",
     "https://evaadev.blob.core.windows.net/media/greatameri283/images/rosa-ahumado_1723744239638.webp"
   ]
 };
-
 
 // Función imagen aleatoria
 function obtenerImagenAleatoria(lista) {
@@ -93,6 +86,27 @@ await fetch(url, {
 
 }
 
+// 🔐 VERIFICACIÓN DEL WEBHOOK DE WHATSAPP
+const VERIFY_TOKEN = "token_whatsapp_123";
+
+app.get("/webhook-encuesta", (req, res) => {
+
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  console.log("Intento de verificación webhook");
+
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    console.log("Webhook verificado correctamente");
+    res.status(200).send(challenge);
+  } else {
+    console.log("Error verificando webhook");
+    res.sendStatus(403);
+  }
+
+});
+
 
 // 🔥 WEBHOOK REAL
 app.post("/webhook-encuesta", async (req, res) => {
@@ -112,9 +126,8 @@ app.post("/webhook-encuesta", async (req, res) => {
 
 telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
 
-    let mensaje = "";
+let mensaje = "";
 let imagenSeleccionada = "";
-
 
 // 🎟 Generar cupón único
 const cupon = `${restaurante.toUpperCase().replace(/\s/g, "")}-${Math.floor(10000 + Math.random() * 90000)}`;
@@ -133,19 +146,15 @@ else if (restaurante.includes("Great American")) {
   mensaje = `Hola ${nombre}, Great American agradece tu visita. 🎁`;
   imagenSeleccionada = obtenerImagenAleatoria(imagenes.GreatAmerican);
 }
-
 else if (restaurante.includes("Muzza")) {
   mensaje = `Hola ${nombre}, Muzza agradece mucho tu visita. 🎁`;
   imagenSeleccionada = obtenerImagenAleatoria(imagenes.Muzza);
 }
-
 else {
   mensaje = `Hola ${nombre}, gracias por responder nuestra encuesta 🎁`;
 }
-
 // 🔗 Generar URL del cupón
 const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encodeURIComponent(imagenSeleccionada)}&cupon=${cupon}&restaurante=${encodeURIComponent(restaurante)}`;
-
 
     console.log("📲 SIMULACIÓN WHATSAPP");
     console.log("Cliente:", nombre, apellido);
@@ -153,7 +162,6 @@ const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encod
     console.log("Mensaje:", mensaje);
     console.log("Cupón generado:", cupon);
     console.log("Imagen enviada:", imagenSeleccionada);
-
 
     console.log("Mensaje enviado a:", telefono);
     // 📲 ENVIAR WHATSAPP REAL
@@ -165,7 +173,6 @@ const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encod
     urlCupon
   );
 
-
    res.json({
     status: "Cupón generado correctamente",
     cliente: `${nombre} ${apellido}`,
@@ -174,7 +181,6 @@ const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encod
     imagen: imagenSeleccionada,
     url: urlCupon
   });
-
 
   } catch (error) {
     console.error("Error enviando WhatsApp:", error);
