@@ -61,20 +61,26 @@ const url = `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`;
 const body = {
   messaging_product: "whatsapp",
   to: telefono.replace("+",""),
-  type: "text",
-  text: {
-    body:
-`Hola ${nombre} 👋
-
-${restaurante} agradece tu visita.
-
-🎁 Tu cupón es:
-${cupon}
-
-Puedes verlo aquí:
-${urlCupon}`
+  type: "template",
+  template: {
+    name: "cupon_encuesta",
+    language: {
+      code: "es_MX"
+    },
+    components: [
+      {
+        type: "body",
+        parameters: [
+          { type: "text", text: nombre },
+          { type: "text", text: restaurante },
+          { type: "text", text: cupon },
+          { type: "text", text: urlCupon }
+        ]
+      }
+    ]
   }
 };
+
 
 const response = await fetch(url, {
   method: "POST",
@@ -86,11 +92,9 @@ const response = await fetch(url, {
 });
 
 const data = await response.json();
-
 console.log("Respuesta WhatsApp API:", data);
 
 }
-
 
 // 🔐 VERIFICACIÓN DEL WEBHOOK DE WHATSAPP
 const VERIFY_TOKEN = "token_whatsapp_123";
