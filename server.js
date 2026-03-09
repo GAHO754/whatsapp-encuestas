@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
 const ultimosCupones = {};
 
-
 const app = express();
 // 🔹 DATOS WHATSAPP
 const WHATSAPP_TOKEN = "EAALZB4BnISHgBQZCwFrusq3aWYWOruiC6ZByGl7ebjY8EM0cNJK93WyFHLHFBnZB9Ws64VpEhDa0n0iZBES2Nb93kleblEJtbTAZBdZB33IoSnvslpqIZAn2enjzNecHjTnoAmTaRTz17HnoXuqxqzd1BmzFcmHcIreM8ZBihJdWAqbgNCDH6C4r0ELZA8DDWuyrVhifjorBJjrQgfZBumAFxYJJcZCFcaxpzZANH1gCZBbzfX81879mPOaGFqeuWZCBIu7Q8iE9v539hOjK7M2hpZCtZCpPFS9CF";
@@ -224,3 +223,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Servidor corriendo en puerto", PORT);
 });
+
