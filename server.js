@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const fetch = require("node-fetch");
+const ultimosCupones = {};
+
 
 const app = express();
 // 🔹 DATOS WHATSAPP
@@ -126,15 +128,30 @@ app.post("/webhook-encuesta", async (req, res) => {
 
     const nombre = req.body.customer?.firstName || "";
     const apellido = req.body.customer?.lastName || "";
-    let telefono = req.body.customer?.phone || "";
     const restaurante = req.body.survey?.name || "";
 
-    if (!telefono) {
-  console.log("No hay teléfono");
-  return res.status(200).send("Sin teléfono");
+  // Ignorar eventos que no vienen de la encuesta
+if (!req.body.customer) {
+  console.log("Evento de WhatsApp ignorado");
+  return res.sendStatus(200);
 }
 
+let telefono = req.body.customer.phone;
+
 telefono = telefono.startsWith("+") ? telefono : `+${telefono}`;
+
+// 🔒 Verificar si ya recibió cupón en las últimas 24 horas
+const ahora = Date.now();
+
+if (ultimosCupones[telefono]) {
+  const diferencia = ahora - ultimosCupones[telefono];
+
+  if (diferencia < 24 * 60 * 60 * 1000) {
+    console.log("⚠️ Cliente ya recibió cupón en las últimas 24h:", telefono);
+    return res.sendStatus(200);
+  }
+}
+
 
 let mensaje = "";
 let imagenSeleccionada = "";
@@ -182,6 +199,10 @@ const urlCupon = `https://whatsapp-encuestas.onrender.com/cupon.html?img=${encod
     cupon,
     urlCupon
   );
+
+  // Guardar momento del último cupón
+ultimosCupones[telefono] = Date.now();
+
 
    res.json({
     status: "Cupón generado correctamente",
